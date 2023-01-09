@@ -7,7 +7,7 @@ import {
     parseFileSync,
     parseString,
     parseStringSync
-} from 'gcode-parser';
+} from './parser';
 
 
 /**

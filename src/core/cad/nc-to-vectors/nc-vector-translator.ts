@@ -1,5 +1,3 @@
-import Interpreter from 'gcode-interpreter';
-
 class Toolpath {
 
     constructor(options) {
