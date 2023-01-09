@@ -2,4 +2,4 @@
 
 ### parser
 
-### interpretter
+### interpreter
