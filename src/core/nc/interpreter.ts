@@ -16,7 +16,7 @@ import {
  *   fromPairs([['a', 1], ['b', 2]]);
  *   // => { 'a': 1, 'b': 2 }
  */
-const fromPairs = (pairs) => {
+const fromPairs = (pairs:[]) => {
     let index = -1;
     const length = (!pairs) ? 0 : pairs.length;
     const result = {};
@@ -51,15 +51,15 @@ const partitionWordsByGroup = (words = []) => {
     return groups;
 };
 
-const interpret = (self, data) => {
+const interpret = (self:any, data:any) => {
     const groups = partitionWordsByGroup(data.words);
 
     for (let i = 0; i < groups.length; ++i) {
-        const words = groups[i];
+        const words:any = groups[i];
         const word = words[0] || [];
-        const letter = word[0];
+        const letter:string = word[0];
         const code = word[1];
-        let cmd = '';
+        let cmd: string = '';
         let args = {};
 
         if (letter === 'G') {
@@ -123,28 +123,29 @@ const interpret = (self, data) => {
 class Interpreter {
     motionMode = 'G0';
     handlers = {};
+    defaultHandler: any;
 
-    constructor(options) {
+    constructor(options: { handlers?: any; defaultHandler?: any; }) {
         options = options || {};
 
         this.handlers = options.handlers || {};
         this.defaultHandler = options.defaultHandler;
     }
-    loadFromStream(stream, callback = noop) {
+    loadFromStream(stream: any, callback:Function = noop) {
         const s = parseStream(stream, callback);
         s.on('data', (data) => {
             interpret(this, data);
         });
         return s;
     }
-    loadFromFile(file, callback = noop) {
+    loadFromFile(file:string, callback:Function = noop) {
         const s = parseFile(file, callback);
         s.on('data', (data) => {
             interpret(this, data);
         });
         return s;
     }
-    loadFromFileSync(file, callback = noop) {
+    loadFromFileSync(file:string, callback:Function = noop) {
         const list = parseFileSync(file);
         for (let i = 0; i < list.length; ++i) {
             interpret(this, list[i]);
@@ -152,14 +153,14 @@ class Interpreter {
         }
         return list;
     }
-    loadFromString(str, callback = noop) {
+    loadFromString(str:string, callback: Function = noop) {
         const s = parseString(str, callback);
         s.on('data', (data) => {
             interpret(this, data);
         });
         return s;
     }
-    loadFromStringSync(str, callback = noop) {
+    loadFromStringSync(str:string, callback: Function = noop) {
         const list = parseStringSync(str);
         for (let i = 0; i < list.length; ++i) {
             interpret(this, list[i]);

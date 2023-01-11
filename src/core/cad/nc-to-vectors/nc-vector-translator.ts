@@ -1,47 +1,84 @@
-class Toolpath {
+import Interpreter from "../../nc/interpreter";
 
-    constructor(options) {
-        const {
-            position,
-            modal,
-            addLine = noop,
-            addArcCurve = noop
-        } = { ...options };
 
-        this.g92offset.x = 0;
-        this.g92offset.y = 0;
-        this.g92offset.z = 0;
+export class NcTranslator extends Interpreter {
+    constructor(options: {}) {
+        super({
+            handlers: (segment: any)=> {
+                console.log('NcTranslator: handler', segment);
+            },
+            defaultHandler: (cmd:any, params:any)=>{}
+        });
+        options = options || {};
+    }
 
-        // Position
-        if (position) {
-            const { x, y, z } = { ...position };
-            this.setPosition(x, y, z);
-        }
-
-        // Modal
-        const nextModal = {};
-        Object.keys({ ...modal }).forEach(key => {
-            if (!Object.prototype.hasOwnProperty.call(this.modal, key)) {
+    async getToolpathSegments(input: string): Promise<any[]> {
+        const eventHandler =this.loadFromString(input, (err: Error, results: any) => {
+            if (err) {
+                console.error(err);
                 return;
             }
-            nextModal[key] = modal[key];
         });
-        this.setModal(nextModal);
+        const toolpathLoadEvent = new Promise((resolve, reject) => {
+            eventHandler.on('data', (data) => {
+                // 'data' event listener
+                // console.log(data);
+            })
+            .on('end', (results) => {
+                // 'end' event listener
+                resolve(results);
+            });
+        });
+    
+        const toolpathSegmentList:any[] = await Promise.all([toolpathLoadEvent]);
 
-        this.fn = { addLine, addArcCurve };
+        const vectorSeedData = await Promise.all(
+            toolpathSegmentList[0].map(async (segment:any)=> {
+                const vectorSeed:any = { block: segment.block };
+                vectorSeed.nc = []
+                segment.words.forEach((word:string[]) => {
+                    const pc: any = {};
+                    const setup: any = {};
+                    switch (word[0]) {
+                        case 'G':
+                            vectorSeed.nc = [...vectorSeed.nc, `${word[0]}${word[1]}`];
+                            break;
+                        case 'X':
+                        case 'Y':
+                        case 'Z':
+                        case 'I':
+                        case 'J':
+                            pc[word[0]] = word[1];
+                            vectorSeed.point = { ...vectorSeed.point, ...pc };
+                            break;
+                        case 'M':
+                        case 'T':
+                            setup[word[0]] = word[1];
+                            vectorSeed.setup = { ...vectorSeed.setup, ...setup };
+                            break;
+                        default:
+                    }
+                });
 
-        const toolpath = new Interpreter({ handlers: this.handlers });
-        toolpath.getPosition = () => ({ ...this.position });
-        toolpath.getModal = () => ({ ...this.modal });
-        toolpath.setPosition = (...pos) => {
-            return this.setPosition(...pos);
-        };
-        toolpath.setModal = (modal) => {
-            return this.setModal(modal);
-        };
+                return vectorSeed;
+            })
+        );
 
-        return toolpath;
+        let vectorSeedProcessed = [];
+        let _nc = [];
+
+        for(let vectorSeed of vectorSeedData) {
+            if(vectorSeed.nc.length === 0) {
+                vectorSeed.nc = _nc;
+            } else {
+                _nc = vectorSeed.nc;
+            }
+
+            vectorSeedProcessed.push(vectorSeed);
+        }
+
+        return vectorSeedProcessed;
     }
 }
 
-export default Toolpath;
+export default {NcTranslator}
