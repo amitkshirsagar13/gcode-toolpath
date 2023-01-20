@@ -1,4 +1,9 @@
-import Interpreter from "../../nc/interpreter";
+import { Line } from "core/3d/3d.models";
+import { IMotion } from "core/3d/motion.model";
+import { IPoint } from "core/3d/point.model";
+import { NcCode } from "core/nc/model/nc-code.model";
+import { Interpreter } from "core/nc/interpreter";
+import { ORIGIN } from "core/cad/nc-utils/3dUtils";
 
 
 export class NcTranslator extends Interpreter {
@@ -12,14 +17,14 @@ export class NcTranslator extends Interpreter {
         options = options || {};
     }
 
-    async getToolpathSegments(input: string): Promise<any[]> {
-        const eventHandler =this.loadFromString(input, (err: Error, results: any) => {
+    async getNcTranslated(input: string): Promise<NcCode[]> {
+        const eventHandler = this.loadFromString(input, (err: Error, results: any) => {
             if (err) {
                 console.error(err);
                 return;
             }
         });
-        const toolpathLoadEvent = new Promise((resolve, reject) => {
+        const toolpathLoadEvent = new Promise<NcCode[]>((resolve, reject) => {
             eventHandler.on('data', (data) => {
                 // 'data' event listener
                 // console.log(data);
@@ -30,7 +35,7 @@ export class NcTranslator extends Interpreter {
             });
         });
     
-        const toolpathSegmentList:any[] = await Promise.all([toolpathLoadEvent]);
+        const toolpathSegmentList:NcCode[][] = await Promise.all([toolpathLoadEvent]);
 
         const vectorSeedData = await Promise.all(
             toolpathSegmentList[0].map(async (segment:any)=> {
@@ -64,7 +69,7 @@ export class NcTranslator extends Interpreter {
             })
         );
 
-        let vectorSeedProcessed = [];
+        let vectorSeedProcessed: NcCode[] = [];
         let _nc = [];
 
         for(let vectorSeed of vectorSeedData) {
@@ -78,6 +83,54 @@ export class NcTranslator extends Interpreter {
         }
 
         return vectorSeedProcessed;
+    }
+
+    MOTION_MODES: string[] = ["G90", "G91"];
+    LINEAR_MOTIONS: string[] = ["G00", "G01", "G0", "G1"];
+    ARC_MOTIONS: string[] = ["G02", "G03", "G2", "G3"];
+    MOTIONS: string[] = [...this.LINEAR_MOTIONS, ...this.ARC_MOTIONS];
+    getToolpathSegments(ncCodeList: NcCode[], origin: IPoint = ORIGIN) {
+        let previousPoint: IPoint = origin;
+        let previousMotion: IMotion = {};
+        for (const ncCode of ncCodeList) {
+            ncCode.preMotion = { ...previousMotion };
+            this.extractMotion(ncCode);
+            if (this.LINEAR_MOTIONS.includes(ncCode.motion?.motionCode ? ncCode.motion.motionCode : '')) {
+                ncCode.prePoint = previousPoint;
+                ncCode.segment = new Line(ncCode);
+                previousPoint = ncCode.point;
+            }
+            previousMotion = {...ncCode.motion};
+        }
+        return ncCodeList;
+    }
+
+    extractMotion(ncCode: NcCode): void {
+        let motionCode: string|undefined = undefined;
+        let mode: string|undefined = undefined;
+        if(ncCode.nc.length > 0) {
+            for (let code of ncCode.nc){
+                if (this.MOTIONS.includes(code)) {
+                    motionCode = code;
+                    break;
+                }
+            }
+            for (let mc of ncCode.nc){
+                if (this.MOTION_MODES.includes(mc)) {
+                    mode = mc;
+                    break;
+                }
+            }
+        }
+        if(motionCode && !ncCode.preMotion?.motionCode) {
+            ncCode.preMotion = { ...ncCode.preMotion, motionCode };
+        }
+        if(mode && !ncCode.preMotion?.motionMode) {
+            ncCode.preMotion = { ...ncCode.preMotion, motionMode: mode };
+        }
+        ncCode.motion = {};
+        ncCode.motion.motionCode = motionCode ? motionCode : ncCode.preMotion?.motionCode;
+        ncCode.motion.motionMode = mode ? mode : ncCode.preMotion?.motionMode;
     }
 }
 

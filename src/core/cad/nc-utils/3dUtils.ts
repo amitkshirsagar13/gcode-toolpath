@@ -1,12 +1,10 @@
-/**
- * 
- */
+import { IPoint } from "core/3d/point.model";
 
-import { Point } from "core/3d/point";
-
-export const ORIGIN: Point = {
-    x: 0,
-    y: 0,
-    z: 0
+export const ORIGIN: IPoint = {
+    X: 0,
+    Y: 0,
+    Z: 0
 };
 
+
+export default { ORIGIN };

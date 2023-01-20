@@ -120,7 +120,7 @@ const interpret = (self:any, data:any) => {
     }
 };
 
-class Interpreter {
+export class Interpreter {
     motionMode = 'G0';
     handlers = {};
     defaultHandler: any;
@@ -170,4 +170,4 @@ class Interpreter {
     }
 }
 
-export default Interpreter;
+export default { Interpreter };

@@ -1,4 +1,6 @@
-import { extractToolpathSegments } from '../src/index';
+import { getNcVectorData, getToolPathSegmentsData } from '../src/index';
+import { NcCode } from "../src/core/nc/model/nc-code.model";
+
 const GCODE_ARRAY = [
     'N1 G17 G20 G90 G94 G54',
     'N2 G0 Z0.25',
@@ -15,14 +17,24 @@ const GCODE_ARRAY = [
 const INPUT_STRING = GCODE_ARRAY.join('\n');
 
 
-describe('HelloWorld', () => {
+describe('NC-Toolpath-Generator', () => {
     it('Interpreters', (done: Function) => {
         console.log(INPUT_STRING);
-        const toolpathSegmentDataPromise = extractToolpathSegments(INPUT_STRING);
-        toolpathSegmentDataPromise.then((toolpathSegmentList) => {
-            console.log(JSON.stringify(toolpathSegmentList));
-            expect(toolpathSegmentList.length).toBe(GCODE_ARRAY.length);
+        const ncVectorDataPromise = getNcVectorData(INPUT_STRING);
+        ncVectorDataPromise.then((ncVectorDataList) => {
+            console.log(JSON.stringify(ncVectorDataList));
+            expect(ncVectorDataList.length).toBe(GCODE_ARRAY.length);
             done();
         });
-    })
+    });
+    it.only('Toolpath', (done: Function) => {
+        console.log(INPUT_STRING);
+        const ncVectorDataPromise: Promise<NcCode[]> = getNcVectorData(INPUT_STRING);
+        ncVectorDataPromise.then(async (ncVectorDataList: NcCode[]) => {
+            const toolpath = await getToolPathSegmentsData(ncVectorDataList);
+            console.log(toolpath);
+            console.log(JSON.stringify(toolpath));
+            done();
+        });
+    });
 })
