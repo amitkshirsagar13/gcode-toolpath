@@ -1,5 +1,5 @@
-import { ORIGIN } from 'core/cad/nc-utils/3dUtils';
-import { NcCode } from 'core/nc/model/nc-code.model';
+import { ORIGIN } from '../../core/cad/nc-utils/3dUtils';
+import { NcCode } from '../../core/nc/model/nc-code.model';
 import { IArc } from './arc.model';
 import { ILine } from './line.model';
 import { IPoint } from './point.model';

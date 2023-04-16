@@ -1,9 +1,9 @@
-import { Line } from 'core/3d/3d.models';
-import { IMotion } from 'core/3d/motion.model';
-import { IPoint } from 'core/3d/point.model';
-import { NcCode } from 'core/nc/model/nc-code.model';
-import { Interpreter } from 'core/nc/interpreter';
-import { ORIGIN } from 'core/cad/nc-utils/3dUtils';
+import { Line } from '../../../core/3d/3d.models';
+import { IMotion } from '../../../core/3d/motion.model';
+import { IPoint } from '../../../core/3d/point.model';
+import { NcCode } from '../../../core/nc/model/nc-code.model';
+import { Interpreter } from '../../../core/nc/interpreter';
+import { ORIGIN } from '../../../core/cad/nc-utils/3dUtils';
 
 export class NcTranslator extends Interpreter {
     constructor(options: {}) {
