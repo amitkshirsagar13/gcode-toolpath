@@ -1,13 +1,12 @@
 import fs from 'fs';
 
 import {     
-    LineStream,
     parseLine,
     parseStream,
     parseString,
     parseStringSync,
     parseFile,
-    parseFileSync } from "core/nc/parser"
+    parseFileSync } from '../../../src/core/nc/parser'
 
     
 describe('gcode-parser', () => {
@@ -16,20 +15,20 @@ describe('gcode-parser', () => {
     });
     describe('Pass a null value as the first argument', () => {
         it('should call parseString\'s callback.', (done) => {
-            parseString(null, (err, results) => {
+            parseString(null, (err: any, results: any) => {
                 expect(err).toBeNull();
                 expect(results.length).toBe(0);
                 done();
             });
         });
         it('should call parseFile\'s callback.', (done) => {
-            parseFile(null, (err, results) => {
+            parseFile(null, (err: any, results: any) => {
                 // expect(!!err).toBeTruthy();
                 done();
             });
         });
         it('should call parseStream\'s callback.', (done) => {
-            parseStream(null, (err, results) => {
+            parseStream(null, (err: any, results: any) => {
                 expect(!!err).toBeTruthy();
                 done();
             });
@@ -39,7 +38,7 @@ describe('gcode-parser', () => {
     describe('Pass an empty text as the first argument', () => {
         it('should get empty results.', (done) => {
             const sampleText = '';
-            parseString(sampleText, (err, results) => {
+            parseString(sampleText, (err: any, results: any) => {
                 expect(results.length).toBe(0);
                 done();
             });
@@ -50,7 +49,7 @@ describe('gcode-parser', () => {
         it('should not parse G-code commands.', (done) => {
             const file = 'test/fixtures/circle.gcode';
 
-            parseFile(file, { noParseLine: true }, (err, results) => {
+            parseFile(file, { noParseLine: true }, (err: any, results: any) => {
                 expect(results.length).toBe(7);
                 done();
             })
@@ -165,8 +164,8 @@ describe('gcode-parser', () => {
                 '  ' // empty line
             ].join('\n');
 
-            parseString(sampleText, (err, results) => {
-                results = results.filter(result => result.length > 0);
+            parseString(sampleText, (err: any, results: any) => {
+                results = results.filter((result: any[]) => result.length > 0);
                 expect(results.length).toBe(0);
                 done();
             });
@@ -204,9 +203,9 @@ describe('gcode-parser', () => {
                 'M3'
             ];
 
-            parseString(sampleText, (err, results) => {
-                results = results.map(result => {
-                    const words = result.words.map(word => {
+            parseString(sampleText, (err: any, results: any) => {
+                results = results.map((result: any) => {
+                    const words = result.words.map((word: any) => {
                         return word.join('');
                     });
                     return words.join('');
@@ -219,7 +218,7 @@ describe('gcode-parser', () => {
 
     describe('File not found exception', () => {
         it('should fail the callback if a file is not present.', (done) => {
-            parseFile('test/fixtures/NO_FILE_ERROR', (err, results) => {
+            parseFile('test/fixtures/NO_FILE_ERROR', (err: any, results: any) => {
                 expect(err).not.toBeNull();
                 expect(err.code).toBe('ENOENT');
                 done();
@@ -231,7 +230,7 @@ describe('gcode-parser', () => {
         it('should call event listeners when loading G-code from file.', (done) => {
             const file = 'test/fixtures/circle.gcode';
 
-            parseFile(file, (err, results) => {
+            parseFile(file, (err: any, results: any) => {
                 expect(results.length).toBe(7);
                 done();
             })
@@ -246,7 +245,7 @@ describe('gcode-parser', () => {
         it('should call event listeners when loading G-code from stream.', (done) => {
             const stream = fs.createReadStream('test/fixtures/circle.gcode', { encoding: 'utf8' });
 
-            parseStream(stream, (err, results) => {
+            parseStream(stream, (err: any, results: any) => {
                 expect(results.length).toBe(7);
                 done();
             })
@@ -261,7 +260,7 @@ describe('gcode-parser', () => {
         it('should call event listeners when loading G-code from string.', (done) => {
             const string = fs.readFileSync('test/fixtures/circle.gcode', 'utf8');
 
-            parseString(string, (err, results) => {
+            parseString(string, (err: any, results: any) => {
                 expect(results.length).toBe(7);
                 done();
             })
@@ -323,7 +322,7 @@ describe('gcode-parser', () => {
 
         it('should get expected results in the callback.', (done) => {
             const stream = fs.createReadStream('test/fixtures/circle.gcode', { encoding: 'utf8' });
-            parseStream(stream, (err, results) => {
+            parseStream(stream, (err: any, results: any) => {
                 expect(results).toEqual(expectedResults);
                 done();
             });
@@ -364,7 +363,7 @@ describe('gcode-parser', () => {
 
         it('should get expected results in the callback.', (done) => {
             const str = fs.readFileSync('test/fixtures/circle.gcode', 'utf8');
-            parseString(str, (err, results) => {
+            parseString(str, (err: any, results: any) => {
                 expect(results).toEqual(expectedResults);
                 done();
             });
@@ -444,7 +443,7 @@ describe('gcode-parser', () => {
         ];
 
         it('should get expected results in the callback.', (done) => {
-            parseFile('test/fixtures/circle.gcode', (err, results) => {
+            parseFile('test/fixtures/circle.gcode', (err: any, results: any) => {
                 expect(results).toEqual(expectedResults);
                 done();
             });
@@ -492,9 +491,9 @@ describe('gcode-parser', () => {
 
     describe('More examples', () => {
         it('should contain the line number.', (done) => {
-            parseFile('test/fixtures/circle-inch.gcode', (err, list) => {
+            parseFile('test/fixtures/circle-inch.gcode', (err: any, list: any[]) => {
                 expect(err).toBeNull();
-                list.forEach((data) => {
+                list.forEach((data: any) => {
                     const { ln } = data;
                     expect(ln).toBeDefined();
                 });
@@ -560,7 +559,7 @@ describe('gcode-parser', () => {
                     words: [['G', 1], ['X', 3], ['Y', 3]]
                 }
             ];
-            parseFile('test/fixtures/special-fields.gcode', (err, results) => {
+            parseFile('test/fixtures/special-fields.gcode', (err: any, results: any) => {
                 expect(results).toEqual(expectedResults);
                 done();
             });
@@ -582,7 +581,7 @@ describe('gcode-parser', () => {
                 }
             ];
 
-            parseFile('test/fixtures/spaces.gcode', (err, results) => {
+            parseFile('test/fixtures/spaces.gcode', (err: any, results: any) => {
                 expect(results).toEqual(expectedResults);
                 done();
             })

@@ -1,5 +1,5 @@
-import { getNcVectorData, getToolPathSegmentsData } from 'index';
-import { NcCode } from "core/nc/model/nc-code.model";
+import { getNcVectorData, getToolPathSegmentsData } from '../src/index';
+import { NcCode } from '../src/core/nc/model/nc-code.model';
 
 const GCODE_ARRAY = [
     'N1 G17 G20 G90 G94 G54',
