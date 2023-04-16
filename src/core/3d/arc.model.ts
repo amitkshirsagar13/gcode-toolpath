@@ -1,9 +1,8 @@
-import { ILine } from "./line.model";
-import { IPoint } from "./point.model";
+import { ILine } from './line.model';
 
 export interface IArc extends ILine {
-    I?: number|undefined;
-    J?: number|undefined;
-    R?: number|undefined;
+    I?: number | undefined;
+    J?: number | undefined;
+    R?: number | undefined;
     clockwise(): boolean;
 }

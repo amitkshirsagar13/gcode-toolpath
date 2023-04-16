@@ -5,15 +5,14 @@
 // measurement unit translator
 
 /**
- * 
- * @param {*} val 
- * @returns 
+ *
+ * @param {*} val
+ * @returns
  */
 export const in2mm = (val: number = 0): number => val * 25.4;
 /**
- * 
- * @param {*} val 
- * @returns 
+ *
+ * @param {*} val
+ * @returns
  */
-export const mm2in = (val: number = 0): number  => val / 25.4;
-
+export const mm2in = (val: number = 0): number => val / 25.4;

@@ -7,7 +7,7 @@ import {
     parseString,
     parseStringSync,
     parseFile,
-    parseFileSync } from "../../../src/core/nc/parser"
+    parseFileSync } from "core/nc/parser"
 
     
 describe('gcode-parser', () => {

@@ -1,8 +1,8 @@
-import { ORIGIN } from "core/cad/nc-utils/3dUtils";
-import { NcCode } from "core/nc/model/nc-code.model";
-import { IArc } from "./arc.model";
-import { ILine } from "./line.model";
-import { IPoint } from "./point.model";
+import { ORIGIN } from 'core/cad/nc-utils/3dUtils';
+import { NcCode } from 'core/nc/model/nc-code.model';
+import { IArc } from './arc.model';
+import { ILine } from './line.model';
+import { IPoint } from './point.model';
 
 export class Point implements IPoint {
     X: number = 0;
@@ -26,18 +26,18 @@ export class Point implements IPoint {
 export class Line implements ILine {
     start: IPoint;
     end: IPoint;
-    nc: string|undefined;
-    mode: string|undefined;
+    nc: string | undefined;
+    mode: string | undefined;
 
     public constructor(ncCode: NcCode) {
         this.end = ncCode.point;
-        this.start = ncCode.prePoint||ORIGIN;
+        this.start = ncCode.prePoint || ORIGIN;
         this.nc = this.end.nc ? this.end.nc : this.start?.nc;
         this.transform();
     }
-    setPoints(start: IPoint|undefined, end: IPoint) {
+    setPoints(start: IPoint | undefined, end: IPoint) {
         this.end = end;
-        this.start = start||ORIGIN;
+        this.start = start || ORIGIN;
         this.nc = end.nc ? end.nc : start?.nc;
     }
     setEndPoint(end: IPoint) {
@@ -51,20 +51,20 @@ export class Line implements ILine {
         }
     }
     isSelected(): boolean {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
     color(): string {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
     width(): number {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
 }
 
 export class Arc extends Line implements IArc {
-    I: number|undefined = undefined;
-    J: number|undefined = undefined;
-    R: number|undefined = undefined;
+    I: number | undefined = undefined;
+    J: number | undefined = undefined;
+    R: number | undefined = undefined;
     setI(value: number) {
         this.I = value;
     }
@@ -76,5 +76,5 @@ export class Arc extends Line implements IArc {
     }
     clockwise(): boolean {
         return this.nc === 'G2';
-    };
+    }
 }

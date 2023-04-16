@@ -8,7 +8,7 @@ import stream, { Transform } from 'stream';
 const noop = () => {};
 const endLinePattern = new RegExp(/.*(?:\r\n|\r|\n)/g);
 
-const streamify = (text: string|null): fs.ReadStream|stream.Readable => {
+const streamify = (text: string | null): fs.ReadStream | stream.Readable => {
     const s = new stream.Readable();
     s.push(text);
     s.push(null);
@@ -45,7 +45,7 @@ const iterateArray = (inArray: any[] = [], opts: Function | any = {}, iteratee: 
     loop();
 };
 
-const computeChecksum = (s:string): number => {
+const computeChecksum = (s: string): number => {
     s = s || '';
     if (s.lastIndexOf('*') >= 0) {
         s = s.substr(0, s.lastIndexOf('*'));
@@ -62,20 +62,19 @@ const computeChecksum = (s:string): number => {
 // Remove anything inside the '()'
 // Remove anything after a ';' to the end of the line, including blank spaces
 const removeComments = (line: string) => {
-    const re1 = new RegExp(/\s*\([^\)]*\)/g); 
+    const re1 = new RegExp(/\s*\([^\)]*\)/g);
     const re2 = new RegExp(/\s*;.*/g);
     const re3 = new RegExp(/\s+/g);
     return line.replace(re1, '').replace(re2, '').replace(re3, '');
 };
 
-const wordExtractPattern = /(%.*)|({.*)|((?:\$\$)|(?:\$[a-zA-Z0-9#]*))|([a-zA-Z][0-9\+\-\.]+)|(\*[0-9]+)/igm;
+const wordExtractPattern = /(%.*)|({.*)|((?:\$\$)|(?:\$[a-zA-Z0-9#]*))|([a-zA-Z][0-9\+\-\.]+)|(\*[0-9]+)/gim;
 // @param {string} line The G-code line
-const parseLine = (line: string| null | undefined, options: any = undefined) => {
-
+const parseLine = (line: string | null | undefined, options: any = undefined) => {
     options = options || {};
     options.flatten = !!options.flatten;
     options.noParseLine = !!options.noParseLine;
-    
+
     const result: any = {
         line: line
     };
@@ -83,9 +82,9 @@ const parseLine = (line: string| null | undefined, options: any = undefined) => 
     if (options.noParseLine) {
         return result;
     }
-    
+
     result.words = [];
-    if(line) {
+    if (line) {
         let ln; // Line number
         let cs; // Checksum
         const words = removeComments(line).match(wordExtractPattern) || [];
@@ -142,10 +141,10 @@ const parseLine = (line: string| null | undefined, options: any = undefined) => 
             }
         }
 
-        (typeof (ln) !== 'undefined') && (result.ln = ln);
+        typeof ln !== 'undefined' && (result.ln = ln);
 
-        (typeof (cs) !== 'undefined') && (result.cs = cs);
-        if (result.cs && (computeChecksum(line) !== result.cs)) {
+        typeof cs !== 'undefined' && (result.cs = cs);
+        if (result.cs && computeChecksum(line) !== result.cs) {
             result.err = true;
         }
     }
@@ -156,7 +155,7 @@ const parseLine = (line: string| null | undefined, options: any = undefined) => 
 // @param {object} stream The G-code line stream
 // @param {options} options The options object
 // @param {function} callback The callback function
-const parseStream = (stream: fs.ReadStream|stream.Readable|null, options: any, callback: Function = noop) => {
+const parseStream = (stream: fs.ReadStream | stream.Readable | null, options: any, callback: Function = noop) => {
     if (typeof options === 'function') {
         callback = options;
         options = {};
@@ -166,20 +165,20 @@ const parseStream = (stream: fs.ReadStream|stream.Readable|null, options: any, c
 
     try {
         const results: any[] = [];
-        if(stream) {
+        if (stream) {
             stream
-            .pipe(new LineStream(options))
-            .on('data', (data) => {
-                emitter.emit('data', data);
-                results.push(data);
-            })
-            .on('end', () => {
-                emitter.emit('end', results);
-                callback && callback(null, results);
-            })
-            .on('error', (error) => {
-                callback(error, null);
-            });
+                .pipe(new LineStream(options))
+                .on('data', (data) => {
+                    emitter.emit('data', data);
+                    results.push(data);
+                })
+                .on('end', () => {
+                    emitter.emit('end', results);
+                    callback && callback(null, results);
+                })
+                .on('error', (error) => {
+                    callback(error, null);
+                });
         } else {
             callback(new Error('Undefined Stream'));
         }
@@ -193,25 +192,25 @@ const parseStream = (stream: fs.ReadStream|stream.Readable|null, options: any, c
 // @param {string} file The G-code path name
 // @param {options} options The options object
 // @param {function} callback The callback function
-const parseFile = (file: string|null, options: any|Function, callback: Function = noop) => {
+const parseFile = (file: string | null, options: any | Function, callback: Function = noop) => {
     if (typeof options === 'function') {
         callback = options;
         options = {};
     }
     file = file || '';
     let stream: fs.ReadStream = fs.createReadStream(file, { encoding: 'utf8' });
-    stream.on('error', (error)=> callback(error));
+    stream.on('error', (error) => callback(error));
     return parseStream(stream, options, callback);
 };
 
-const parseFileSync = (file: string, options: any|Function = {}) => {
+const parseFileSync = (file: string, options: any | Function = {}) => {
     return parseStringSync(fs.readFileSync(file, 'utf8'), options);
 };
 
 // @param {string} str The G-code text string
 // @param {options} options The options object
 // @param {function} callback The callback function
-const parseString = (str: string|null, options: any| Function, callback: any | Function = noop) => {
+const parseString = (str: string | null, options: any | Function, callback: any | Function = noop) => {
     if (typeof options === 'function') {
         callback = options;
         options = {};
@@ -219,7 +218,7 @@ const parseString = (str: string|null, options: any| Function, callback: any | F
     return parseStream(streamify(str), options, callback);
 };
 
-const parseStringSync = (str: string, options: any|Function = {}) => {
+const parseStringSync = (str: string, options: any | Function = {}) => {
     const { flatten = false, noParseLine = false } = { ...options };
     const results = [];
     const lines = str.split('\n');
@@ -270,7 +269,7 @@ class LineStream extends Transform {
         };
     }
 
-    _transform(chunk: any, encoding: string|any, next: Function) {
+    _transform(chunk: any, encoding: string | any, next: Function) {
         // decode binary chunks as UTF-8
         encoding = encoding || 'utf8';
 
@@ -299,25 +298,29 @@ class LineStream extends Transform {
             lines.shift();
         }
 
-        this.state.lastChunkEndedWithCR = (this.lineBuffer[this.lineBuffer.length - 1] === '\r');
+        this.state.lastChunkEndedWithCR = this.lineBuffer[this.lineBuffer.length - 1] === '\r';
 
-        if ((this.lineBuffer[this.lineBuffer.length - 1] === '\r') ||
-            (this.lineBuffer[this.lineBuffer.length - 1] === '\n')) {
+        if (this.lineBuffer[this.lineBuffer.length - 1] === '\r' || this.lineBuffer[this.lineBuffer.length - 1] === '\n') {
             this.lineBuffer = '';
         } else {
             const line = lines.pop() || '';
             this.lineBuffer = line;
         }
-        iterateArray(lines, { batchSize: this.options.batchSize }, (line: string, key: string) => {
-            line = line.trim();
-            if (line.length > 0) {
-                const result = parseLine(line, {
-                    flatten: this.options.flatten,
-                    noParseLine: this.options.noParseLine
-                });
-                this.push(result);
-            }
-        }, next);
+        iterateArray(
+            lines,
+            { batchSize: this.options.batchSize },
+            (line: string, key: string) => {
+                line = line.trim();
+                if (line.length > 0) {
+                    const result = parseLine(line, {
+                        flatten: this.options.flatten,
+                        noParseLine: this.options.noParseLine
+                    });
+                    this.push(result);
+                }
+            },
+            next
+        );
     }
 
     _flush(done: Function) {
@@ -339,12 +342,4 @@ class LineStream extends Transform {
     }
 }
 
-export {
-    parseLine,
-    LineStream,
-    parseStream,
-    parseFile,
-    parseFileSync,
-    parseString,
-    parseStringSync
-};
+export { parseLine, LineStream, parseStream, parseFile, parseFileSync, parseString, parseStringSync };
