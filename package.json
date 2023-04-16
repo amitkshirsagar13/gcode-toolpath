@@ -1,6 +1,6 @@
 {
-  "name": "gcode-toolpath",
-  "version": "0.0.1",
+  "name": "@amitkshirsagar/gcode-toolpath",
+  "version": "0.0.2",
   "description": "Gcode to Vector generation",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -33,6 +33,7 @@
     "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline",
     "coverage": "ts-jest --coverage",
     "prepublish": "npm run build && npm test",
+    "publish-public": "npm publish --access public",
     "test": "jest",
     "test:watch": "ts-jest --watch",
     "type-check": "npx tsc --noEmit",
