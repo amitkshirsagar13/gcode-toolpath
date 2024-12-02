@@ -1,6 +1,6 @@
 {
   "name": "@amitkshirsagar/gcode-toolpath",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Gcode to Vector generation",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -42,7 +42,11 @@
   "author": "amit.kshirsagar.13@gmail.com",
   "homepage": "https://github.com/amitkshirsagar13/editor-components",
   "dependencies": {
-    "core-js": "^3.27.1"
+    "core-js": "^3.27.1",
+    "events": "^3.3.0",
+    "fs": "^0.0.1-security",
+    "stream": "^0.0.3",
+    "timers": "^0.1.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.20.7",
